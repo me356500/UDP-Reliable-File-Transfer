@@ -1,4 +1,4 @@
-This program is the second place in performance.
+This program is the second place in performance competition.
 
 #  Homework2 UDP Reliable File Transfer
 ## Overview
