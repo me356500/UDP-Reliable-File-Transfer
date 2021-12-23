@@ -1,25 +1,5 @@
-#include <bits/stdc++.h>
-#include <ctype.h>
-#include <netdb.h>
-#include <stdio.h>
-#include <errno.h>
-#include <stdlib.h>
-#include <stdint.h>
-#include <unistd.h>
-#include <string.h>
-#include <signal.h>
-#include <strings.h>
-#include <sys/uio.h>
-#include <sys/time.h>
-#include <arpa/inet.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <sys/select.h>
-#include <experimental/filesystem>
-using namespace std;
-#define RECV_TIMEO_USEC 100000
-#define SEND_TIMEO_USEC 250000
-// cd /home/w/Desktop/OS/np_hw2/final
+#include "headers.h"
+
 #pragma pack(1) 
 struct packet{
     
@@ -75,7 +55,6 @@ void sendFile(int sockfd, struct sockaddr  *recv_addr, socklen_t recvlen, const 
     time_t t1,t2; 
     int n = 0;
     packet close ;
-    
     close.serial_n = file_size;
     strcpy(close.data, "close");
     send_string.emplace_back((close));
@@ -107,14 +86,11 @@ void sendFile(int sockfd, struct sockaddr  *recv_addr, socklen_t recvlen, const 
         if(atoi(recvi) == n )n++;
         //if(atoi(recvi) == send_string.end()->serial_n) break;
     }
-    
     delete recvi;
     t2 = time(NULL);   
     cout<< "Transferring Time: " << t2 - t1 <<" second\nFile size: "; 
     cout << file_size << '\n';
     return;
-
-
 }
 int main(int argc ,char **argv) {
     std::ios::sync_with_stdio(false);
@@ -123,19 +99,14 @@ int main(int argc ,char **argv) {
         printf("Usage: ./sender2  <file name> <receiver IP> <receiver port>\n");
         exit(0);
     }
-
-    
     int recvfd;
     struct addrinfo hints, *res;
     struct sockaddr_in receiver_addr;
     char receiver_ip[INET6_ADDRSTRLEN];
-
     memset(&hints, 0, sizeof(hints));
     hints.ai_socktype = SOCK_DGRAM;
     hints.ai_family = AF_INET;
-
-    if(getaddrinfo(argv[2], NULL, &hints, &res) != 0)
-    {
+    if(getaddrinfo(argv[2], NULL, &hints, &res) != 0) {
         perror("getaddrinfo error");
         exit(EXIT_FAILURE);
     }
@@ -143,21 +114,13 @@ int main(int argc ,char **argv) {
     struct in_addr host_addr;
     host_addr.s_addr = ((struct sockaddr_in *)(res->ai_addr))->sin_addr.s_addr;
     inet_ntop(AF_INET, &host_addr, receiver_ip, INET6_ADDRSTRLEN);
-    
-
     recvfd = socket(AF_INET, SOCK_DGRAM, 0);
-    
-
     struct sockaddr_in recv_addr;
     bzero(&recv_addr, sizeof(recv_addr));
     recv_addr.sin_family = AF_INET;
     recv_addr.sin_port = htons(atoi(argv[3]));
-
     if(inet_pton(AF_INET, receiver_ip, &recv_addr.sin_addr) <= 0)
         printf("inet_pton error for %s\n", argv[2]);
-
-    //transfer file
-    
     sendFile(recvfd, (struct sockaddr *)&recv_addr, res->ai_addrlen, argv[1]);
     freeaddrinfo(res);
     
