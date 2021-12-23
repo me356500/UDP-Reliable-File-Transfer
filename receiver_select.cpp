@@ -1,25 +1,4 @@
-#include <bits/stdc++.h>
-#include <ctype.h>
-#include <netdb.h>
-#include <stdio.h>
-#include <errno.h>
-#include <stdlib.h>
-#include <stdint.h>
-#include <unistd.h>
-#include <string.h>
-#include <signal.h>
-#include <strings.h>
-#include <sys/uio.h>
-#include <sys/time.h>
-#include <arpa/inet.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <sys/select.h>
-
-using namespace std;
-//cd /home/w/Desktop/OS/np_hw2/final
-#define RECV_TIMEO_USEC 100000
-#define SEND_TIMEO_USEC 250000
+#include "headers.h"
 #pragma pack(1) 
 string file;
 struct packet{
@@ -43,21 +22,16 @@ int select_time(int fd, int usec)
 void recv(int sockfd, struct sockaddr * sender_addr,socklen_t len) {
     fstream outfile;
     outfile.open(file, ios_base::out | ios_base::binary);
-    
-    
     vector<packet> storage;
     int write_size = 0;
     char *dest = (char *)malloc(2000000000);
     int cpy = 0, start = 0, now;
-    
-  
     packet *recvp = new packet;
     char *sendi = (char *) malloc (10);
     string ti;
     strcpy(sendi, "0");
     while(1) {
         now = 0;
-        
         if(select_time(sockfd, RECV_TIMEO_USEC) == 0) {
             //cout << "recv ack timeout\n";
             if(start != 0)
@@ -67,7 +41,7 @@ void recv(int sockfd, struct sockaddr * sender_addr,socklen_t len) {
         }
         else {
             
-            if(recvfrom(sockfd, (struct packet*)recvp, sizeof(packet), 0, sender_addr, &len) < 0){ 
+            if(recvfrom(sockfd, (struct packet*)recvp, sizeof(packet), 0, sender_addr, &len) < 0) { 
                 perror("recvmsg error");
                 exit(-1);
             }
@@ -94,34 +68,25 @@ void recv(int sockfd, struct sockaddr * sender_addr,socklen_t len) {
         start = now;
         ti = to_string(recvp->serial_n);
         strcpy(sendi, ti.c_str());
-        
-            
-        
-               
-        
-        
+             
         ackk:
-        
-        if(sendto(sockfd, (char *)sendi, sizeof(sendi), 0, sender_addr, len)  < 0) {
-            cout << "send error\n";
-            exit(-1);
-        }
+            if(sendto(sockfd, (char *)sendi, sizeof(sendi), 0, sender_addr, len)  < 0) {
+                cout << "send error\n";
+                exit(-1);
+            }
         
     }
-     for(int i = 0; i < 20; i++) {
+       for(int i = 0; i < 20; i++) {
        
         if(select_time(sockfd, RECV_TIMEO_USEC) == 0)
             continue;
         else {
-            if(recvfrom(sockfd, (struct packet*)recvp, sizeof(packet), 0, sender_addr, &len) < 0)
-            {
+            if(recvfrom(sockfd, (struct packet*)recvp, sizeof(packet), 0, sender_addr, &len) < 0) {
                 perror("recv error");
                 exit(-1);
             }
         }
-
-      
-
+           
         if(sendto(sockfd, (char *)sendi, sizeof(sendi), 0, sender_addr, len) < 0) {
             perror("send error");
             exit(-1);
@@ -144,15 +109,10 @@ int main(int argc, char **argv) {
         printf("Usage: ./receiver1 <filename> <port>\n");
         exit(0);
     }
-
     int sockfd;
     struct sockaddr_in receiver_addr;
-
     //creatre a udp socket
     sockfd = socket(AF_INET, SOCK_DGRAM, 0);
-    
-    
-
     bzero(&receiver_addr, sizeof(receiver_addr));
     receiver_addr.sin_family = AF_INET;
     receiver_addr.sin_addr.s_addr = htonl(INADDR_ANY);
@@ -164,12 +124,9 @@ int main(int argc, char **argv) {
     }
 
     char ip[INET_ADDRSTRLEN];
-    inet_ntop(AF_INET, &(receiver_addr.sin_addr), ip, INET_ADDRSTRLEN);
-
-    
+    inet_ntop(AF_INET, &(receiver_addr.sin_addr), ip, INET_ADDRSTRLEN); 
     struct sockaddr_in sender_addr;
     recv(sockfd, (struct sockaddr *)&sender_addr, sizeof(sender_addr));
-    
     close(sockfd);
     return 0;
 }
