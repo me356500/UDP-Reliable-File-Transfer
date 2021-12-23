@@ -1,3 +1,5 @@
+This program is the second place in performance.
+
 #  Homework2 UDP Reliable File Transfer
 ## Overview
 In this homework, you need to implement a UDP reliable file transfer protocol on the application level using 3 different timeout mechanisms.
@@ -35,34 +37,6 @@ You can output whatever information you need on the screen (`stdout`). We will o
 
 You can only use C or C++ in this homework.
 
-### SIGALRM
-`sender_sigalrm` will send a file to `receiver_sigalrm`, and `receiver_sigalrm` will save the file. Due to the unreliable underlying network conditions, your `sender_sigalrm` and `receiver_sigalrm` must use **SIGALRM** to implement your retransmission mechanism.
-
-The command to start the receiver:
-```shell
-receiver_sigalrm [save filename] [bind port]
-```
-
-The command to start the sender:
-```shell
-sender_sigalrm [send filename] [target address] [connect port]
-```
-
-For example, if the sender is about to send a file named `a.txt` to the receiver, whose IP address and port are `127.0.0.1` and `5000`, and the receiver will save the file as `b.txt`:
-* Start the receiver first:
-```shell
-receiver_sigalrm b.txt 5000
-```
-* Then start the sender:
-```shell
-sender_sigalrm a.txt 127.0.0.1 5000
-```
-* After finishing the file transfer, **both `sender_sigalrm` and `receiver_sigalrm` should terminate automatically**.
-* We will test if `a.txt` is the same as `b.txt`.
-
-> Note: For the **SIGALRM** timeout method, you need to use **siginterrupt** to allow the SIGALRM signal to interrupt a system call.
-> 
-
 ### select
 `sender_select` will send a file to `receiver_select`, and `receiver_select` will save the file. Due to the unreliable underlying network conditions, your `sender_select` and `receiver_select` must use **select** to implement your retransmission mechanism.
 
@@ -88,30 +62,6 @@ sender_select a.txt 127.0.0.1 5000
 * After finishing the transmission,  **both `sender_select` and `receiver_select` should terminate automatically**.
 * We will test if `a.txt` is the same as `b.txt`.
 
-### setsockopt
-`sender_sockopt` will send a file to `receiver_sockopt`, and `receiver_sockopt` will save the file. Due to the unreliable underlying network conditions, your `sender_sockopt` and `receiver_sockopt` must use **setsockopt** to implement your retransmission mechanism.
-
-The command to start the receiver:
-```shell
-receiver_sockopt [save filename] [bind port]
-```
-
-The command to start the sender:
-```shell
-sender_sockopt [send filename] [target address] [connect port]
-```
-
-For example, if the sender is about to send a file named `a.txt` to the receiver, whose IP address and port are `127.0.0.1` and `5000`, and the receiver will save the file as `b.txt`:
-* Start the receiver first:
-```shell
-receiver_sockopt b.txt 5000
-```
-* Then start the sender:
-```shell
-sender_sockopt a.txt 127.0.0.1 5000
-```
-* After finishing the transmission, you have to **both `sender_sockopt` and `receiver_sockopt` should terminate automatically**.
-* We will test if `a.txt` is the same as `b.txt`.
 
 ## Performance (Bonus +20)
 **You are free to decide whether or not to enroll in this competition to earn at most 20 bonus.**
